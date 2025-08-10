@@ -13,6 +13,9 @@ FROM        alpine:latest
 COPY        --from=build /usr/local/bin/webhook /usr/local/bin/webhook
 WORKDIR     /etc/webhook
 RUN         apk add --update curl
+RUN         curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV         PATH="/root/.cargo/bin:${PATH}"
+RUN         uv tool install llm
 VOLUME      ["/etc/webhook"]
 EXPOSE      9000
 ENTRYPOINT  ["/usr/local/bin/webhook"]
