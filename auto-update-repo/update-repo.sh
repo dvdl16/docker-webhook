@@ -1,5 +1,5 @@
 #!/bin/bash
-set -uo pipefail
+set -o pipefail
 
 # Set path to this script
 SCRIPTPATH="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
