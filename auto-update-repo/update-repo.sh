@@ -1,5 +1,5 @@
 #!/bin/bash
-set -o pipefail
+set -uo pipefail
 
 # Set path to this script
 SCRIPTPATH="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
@@ -8,7 +8,7 @@ SCRIPTNAME="${BASH_SOURCE[0]##*/}"
 
 check_and_update() {
   # Get inside the git repo directory
-  cd "${SCRIPTPATH}"/.. || exit
+  cd "${SCRIPTPATH}"/.. || exit 1
   # Get the branch currently used
   CURBRANCH=$(git rev-parse --abbrev-ref HEAD)
   # Get latest updates to the repo
@@ -34,10 +34,10 @@ check_and_update() {
     # Push and create release if credentials are provided
     if [[ -n ${GITHUB_USER} ]] && [[ -n ${GITHUB_TOKEN} ]]; then
       git push origin "${CURBRANCH}" && \
-      curl -s -X POST -H "Content-Type: application/json" \
+      curl -sf -X POST -H "Content-Type: application/json" \
         -H "Authorization: token ${GITHUB_TOKEN}" \
         -d '{"tag_name":"'"${LATEST_RELEASE}"'","target_commitish":"'"${CURBRANCH}"'","name":"webhook '"${LATEST_RELEASE}"'","body":"Release for webhook version '"${LATEST_RELEASE}"'.","draft":false,"prerelease":false}' \
-        https://api.github.com/repos/${GITHUB_USER}/docker-webhook/releases
+        https://api.github.com/repos/"${GITHUB_USER}"/docker-webhook/releases
     else
       git push origin "${CURBRANCH}"
       echo "GitHub credentials not provided - skipping release creation"
